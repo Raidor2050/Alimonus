@@ -1,0 +1,44 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+  functions = "netlify/functions"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+[functions]
+  node_bundler = "esbuild"
+
+# Friendly API path for functions: /api/spotify-token -> /.netlify/functions/spotify-token
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+# SPA fallback. Netlify serves real files (assets, favicon) before this rule,
+# so only unknown paths fall through to index.html.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Light-touch security headers. No CSP on purpose: the YouTube and Spotify players,
+# Google Fonts and Supabase would all need allow-listing and it's easy to break playback.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    # YouTube embeds need the origin as referrer (error 153 otherwise).
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    # Microphone for the tuner; autoplay and encrypted-media stay at browser defaults for the players.
+    Permissions-Policy = "microphone=(self), camera=(), geolocation=()"
+
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "no-cache"

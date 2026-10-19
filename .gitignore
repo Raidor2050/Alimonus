@@ -1,0 +1,22 @@
+node_modules
+dist
+.env
+.env.local
+.env.*.local
+.netlify
+coverage
+*.log
+.DS_Store
+test-results
+playwright-report
+
+# Local tooling
+.claude/
+.vscode/*
+!.vscode/extensions.json
+.idea
+Thumbs.db
+
+# Supabase CLI local state
+supabase/.temp
+supabase/.branches
